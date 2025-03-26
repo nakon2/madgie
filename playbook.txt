@@ -1,0 +1,97 @@
+REDIS
+
+
+# v1.0
+---
+
+- hosts: all
+  vars:
+    redis_data_dir: /srv/redis
+    
+  roles:
+    - role: redis
+      redis_setting_maxmemory_prct: "{{ redis_memory_prct }}"
+      redis_hosts: "{{ play_hosts }}"
+
+
+Dans /etc/ansible/roles/redis/vars il faut:
+cp RedHat-8.yml RedHat-9.yml
+vim  RedHat-9.yml
+
+```
+redis_package_name: "redis"
+redis_default_config_dir: /etc/redis/
+```
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+APACHE
+
+# v1.0
+---
+
+- hosts: all
+  vars:
+    site_name: "widal-testx"
+    site_aliases: "widal-testx.dev01.ovh.smile.ci"
+    site_dir: /var/www
+  roles:
+    - role: apache
+      apache2_data_dir: "{{ site_dir }}"
+      apache2_vhosts:
+        site:
+          vhost_name: "{{ site_name }}" 
+          server_aliases: "{{ site_aliases.split(',') | default([ansible_fqdn]) }}"
+    - role: security-apache
+      security_level: 2
+      
+      
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+MARIADB
+
+# v1.0
+---
+
+- hosts: all
+  vars:
+    mysql_version: 10.11
+    mysql_config_max_connections: 500
+    mysql_config_innodb_buffer_pool_size_prct: 0.7
+    #mysql_data_dir: /srv/mysql
+    #mysql_backup_dir: /srv/backup/mysql
+    db_name: "bob"
+    db_user: "bob"
+    db_pass: "bob"
+  roles:
+    - role: mariadb-server
+      mysql_databases:
+        db:
+          user: "{{ db_user }}"
+          db_name: "{{ db_name }}"
+          password: "{{ db_pass }}"
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+TOMCAT
+
+# v1.0
+---
+
+- hosts: all
+  vars:
+    tomcat_apm_enable: false
+    tomcat_version: 9
+    tomcat_install_dir: /srv
+    tomcat_java_version: 8
+    tomcat_heap_size_prct: 0.75
+  roles:
+    - role: tomcat
+
+
